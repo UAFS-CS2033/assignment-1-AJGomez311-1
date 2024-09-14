@@ -4,6 +4,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.io.File;
+import java.io.FileReader;
 
 public class Server{
     private ServerSocket serverSocket;
@@ -18,7 +20,7 @@ public class Server{
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),true);
 
-        //*** Application Protocol *****
+      /*  //*** Application Protocol *****
         String buffer = in.readLine();
         while(buffer.length() != 0){
             System.out.println(buffer);
@@ -31,6 +33,43 @@ public class Server{
 
         in.close();
         out.close();
+        */
+        String request = in.readLine();
+        if(request != null && !request.isEmpty()){
+            System.out.println("The request: " + request);
+        
+
+        String[] requestPart = request.split(" ");
+        if(requestPart.length >=2 && requestPart[0].equals("GET")){
+            String requestedFile = requestPart[1].substring(1);
+            if(requestedFile.isEmpty()){
+                requestedFile = "index.html";
+            }
+        
+
+        File file = new File("docroot/" + requestedFile);  
+        if(file.exists() && !file.isDirectory()){
+            out.printf("HTTP/1.1 200 OK\n");
+            out.printf("Content-Length: " + file.length() + "\n");
+            out.printf("Content-Type: text/html\n\n");
+
+            BufferedReader fr = new BufferedReader(new FileReader(file));
+            String fl;
+            while((fl = fr.readLine()) != null){
+                out.println(fl);
+            }
+            fr.close();
+
+        }else{
+            out.printf("HTTP/1.1 404 Not Found\n");
+            out.printf("Content-Type: text/html\n\n");
+            out.printf("<h1>404 Not Found</h1>");
+        }
+        }
+        }
+        in.close();
+        out.close();
+
     }
 
     public void run() throws IOException{
