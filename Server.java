@@ -37,17 +37,19 @@ public class Server{
         String request = in.readLine();
         if(request != null && !request.isEmpty()){
             System.out.println("The request: " + request);
+
+        }
         
 
         String[] requestPart = request.split(" ");
         if(requestPart.length >=2 && requestPart[0].equals("GET")){
             String requestedFile = requestPart[1].substring(1);
             if(requestedFile.isEmpty()){
-                requestedFile = "index.html";
+                requestedFile = "home.html";
             }
         
 
-        File file = new File("docroot/" + requestedFile);  
+        File file = new File("/home/student/projects/assignment-1-AJGomez311-1/docroot/");  
         if(file.exists() && !file.isDirectory()){
             out.printf("HTTP/1.1 200 OK\n");
             out.printf("Content-Length: " + file.length() + "\n");
@@ -66,7 +68,7 @@ public class Server{
             out.printf("<h1>404 Not Found</h1>");
         }
         }
-        }
+        
         in.close();
         out.close();
 
